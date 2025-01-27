@@ -4,7 +4,6 @@ df = pd.read_csv("daten/weatherAUS.csv")
 
 df = df.dropna()
 
-print(df.columns)
 df = df.drop(columns=["WindGustDir", "WindDir9am", "WindDir3pm", "Date", "Location"])
 print(df.head())
 
