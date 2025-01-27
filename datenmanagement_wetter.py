@@ -5,10 +5,10 @@ df = pd.read_csv("daten/weatherAUS.csv")
 df = df.dropna()
 
 df = df.drop(columns=["WindGustDir", "WindDir9am", "WindDir3pm", "Date", "Location"])
-print(df.head())
-
-print(df["RainToday"])
-print(df["RainTomorrow"])
+# print(df.head())
+#
+# print(df["RainToday"])
+# print(df["RainTomorrow"])
 
 # rain_dict = {"No": 0, "Yes": 1}
 # df["RainToday"] = df["RainToday"].map(rain_dict)
@@ -37,6 +37,3 @@ x_test, x_vali, y_test, y_vali = train_test_split(x_test, y_test,
                                                     test_size=0.75,
                                                     random_state=42,
                                                     stratify=y_test)
-
-print(x_train)
-print(y_train)
