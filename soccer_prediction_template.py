@@ -17,7 +17,9 @@ x_train, x_test, y_train, y_test, quotas_train, quotas_test = train_test_split(x
                                                     random_state=9)
 
 # --- Make classification
-cls = tree.DecisionTreeClassifier(min_samples_split = 3,
+cls = tree.DecisionTreeClassifier(min_samples_split=3,
+                                  # min_samples_leaf=20,
+                                  # max_features=20,
                                   max_depth=7,
                                   random_state=9)
 cls.fit(X=x_train, y=y_train)
@@ -38,7 +40,7 @@ probabilities.set_index(x_test.index, inplace=True)
 
 # Cutoffs - Here the minimum of probability can be set for each category.
 # Example: The model must assign at least a probability of xyz in order to make a prediction.
-cutoffs = {'1': 0.5, '0': 0.3, '2': 0.35}
+cutoffs = {'1': 0.75, '0': 0.1, '2': 0.35}
 
 # Create prediction of result-tendency of the game
 probabilities['predicted'] = multiclass_prediction_from_probabilities(
