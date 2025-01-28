@@ -1,19 +1,32 @@
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
 from datenmanagement_wetter import (x_train, x_test, x_vali,
                                    y_train, y_test, y_vali)
+from sklearn.model_selection import cross_validate
 
 PARAMS = {"max_depth": 4}
 
-classifier = DecisionTreeClassifier(**PARAMS)
+# classifier = DecisionTreeClassifier(**PARAMS)
+classifier = SVC()
+
+# classifier_cv = cross_validate(classifier, x_train, y_train, cv=5, scoring="recall")
+# overall_recall = classifier_cv["test_score"].mean()
+# print("Recall: ", overall_recall)
+# print(classifier_cv["test_score"])
+
+
+
 # alternativ:
 # classifier = DecisionTreeClassifier(max_depth=4)
 
 classifier.fit(x_train, y_train)
 
-CUTOFF = 0.2
-y_pred_train_proba = classifier.predict_proba(x_train)
-y_pred_train = y_pred_train_proba[:, 1] >= CUTOFF
+# CUTOFF = 0.2
+# y_pred_train_proba = classifier.predict_proba(x_train)
+# y_pred_train = y_pred_train_proba[:, 1] >= CUTOFF
+
+y_pred_train = classifier.predict(x_train)
 
 correct_classified = y_pred_train == y_train
 # print(correct_classified.sum())
@@ -37,9 +50,10 @@ print("Training Accuracy: ", accuray_train)
 print("Training Area under the curve: ", auc_score_train)
 
 ### Validation Performance
-y_pred_vali = classifier.predict_proba(x_vali)
-print(y_pred_vali)
-y_pred_vali = y_pred_vali[:, 1] >= CUTOFF
+# y_pred_vali = classifier.predict_proba(x_vali)
+# print(y_pred_vali)
+# y_pred_vali = y_pred_vali[:, 1] >= CUTOFF
+y_pred_vali = classifier.predict(x_vali)
 
 df_predictions_vali = pd.DataFrame({"actual": y_vali,
                                     "prediction": y_pred_vali})

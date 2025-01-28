@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from soccer_datenmanagement_cls import x, y, quotas, dat
 from _utils.multiclass_prediction_from_probabilities import multiclass_prediction_from_probabilities
+from sklearn.metrics import precision_score, recall_score, accuracy_score, roc_auc_score
 
 
 # --- Splitting for getting training and test datasets. Also quotas object is splitted, which is required
@@ -23,6 +24,15 @@ cls = tree.DecisionTreeClassifier(min_samples_split=3,
                                   max_depth=7,
                                   random_state=9)
 cls.fit(X=x_train, y=y_train)
+
+# --- Make prediction
+y_pred_train = cls.predict(X=x_train)
+precision_train = precision_score(y_train, y_pred_train, pos_label=0, average="macro")
+recall_train = recall_score(y_train, y_pred_train, pos_label=0, average="macro")
+accuray_train = accuracy_score(y_train, y_pred_train)
+print("Training Precision: ", precision_train)
+print("Training Recall: ", recall_train)
+print("Training Accuracy: ", accuray_train)
 
 # --- Make Plot (can be removed when different models are build
 # tree.plot_tree(cls)
@@ -52,6 +62,14 @@ probabilities['actual'] = y_test # Attach actual values to table
 probabilities = pd.concat((probabilities, quotas_test), axis=1) # Attach quotas to table
 
 probabilities.dropna(inplace=True) # Drop games that are not predicted
+
+precision_test = precision_score(probabilities['actual'], probabilities['predicted'], pos_label=0, average="macro")
+recall_test = recall_score(probabilities['actual'], probabilities['predicted'], pos_label=0, average="macro")
+accuray_test = accuracy_score(probabilities['actual'], probabilities['predicted'])
+print("Test Precision: ", precision_test)
+print("Test Recall: ", recall_test)
+print("Test Accuracy: ", accuray_test)
+print("Overfitting: ", accuray_train - accuray_test)
 
 # --- Generate confusion matrix
 cm = pd.crosstab(index=probabilities['actual'], columns=probabilities['predicted'], margins = True)
