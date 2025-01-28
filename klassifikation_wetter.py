@@ -12,8 +12,8 @@ classifier = DecisionTreeClassifier(**PARAMS)
 classifier.fit(x_train, y_train)
 
 CUTOFF = 0.2
-y_pred_train = classifier.predict_proba(x_train)
-y_pred_train = y_pred_train[:, 1] >= CUTOFF
+y_pred_train_proba = classifier.predict_proba(x_train)
+y_pred_train = y_pred_train_proba[:, 1] >= CUTOFF
 
 correct_classified = y_pred_train == y_train
 # print(correct_classified.sum())
@@ -26,13 +26,15 @@ cm = pd.crosstab(index=df_predictions["prediction"],
                     margins=True)
 print(cm)
 
-from sklearn.metrics import precision_score, recall_score, accuracy_score
+from sklearn.metrics import precision_score, recall_score, accuracy_score, roc_auc_score
 precision_train = precision_score(df_predictions["actual"], df_predictions["prediction"], pos_label=0)
 recall_train = recall_score(df_predictions["actual"], df_predictions["prediction"], pos_label=0)
 accuray_train = accuracy_score(df_predictions["actual"], df_predictions["prediction"])
+auc_score_train = roc_auc_score(df_predictions["actual"], y_pred_train_proba[:, 1])
 print("Training Precision: ", precision_train)
 print("Training Recall: ", recall_train)
 print("Training Accuracy: ", accuray_train)
+print("Training Area under the curve: ", auc_score_train)
 
 ### Validation Performance
 y_pred_vali = classifier.predict_proba(x_vali)
