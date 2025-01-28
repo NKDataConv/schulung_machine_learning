@@ -1,6 +1,8 @@
 # ----- CLASSIFICATION TREES
+import mlflow
 from sklearn.model_selection import train_test_split
 from sklearn import tree, metrics
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,7 +10,7 @@ from soccer_datenmanagement_cls import x, y, quotas, dat
 from _utils.multiclass_prediction_from_probabilities import multiclass_prediction_from_probabilities
 from sklearn.metrics import precision_score, recall_score, accuracy_score, roc_auc_score
 
-
+mlflow.start_run()
 # --- Splitting for getting training and test datasets. Also quotas object is splitted, which is required
 # for model-evaluation later on.
 x_train, x_test, y_train, y_test, quotas_train, quotas_test = train_test_split(x,
@@ -17,12 +19,20 @@ x_train, x_test, y_train, y_test, quotas_train, quotas_test = train_test_split(x
                                                     test_size=0.4,
                                                     random_state=9)
 
+PARAMS = {"n_estimators": 1100,
+          "max_depth": 8,
+          "min_impurity_decrease": 0.0001,
+          "min_samples_split":200}
+
 # --- Make classification
-cls = tree.DecisionTreeClassifier(min_samples_split=3,
-                                  # min_samples_leaf=20,
-                                  # max_features=20,
-                                  max_depth=7,
-                                  random_state=9)
+cls = RandomForestClassifier(**PARAMS)
+# cls = GradientBoostingClassifier()
+
+for key, value in PARAMS.items():
+    mlflow.log_param(key, value)
+
+# --- Make classification
+# cls = RandomForestClassifier(**params)
 cls.fit(X=x_train, y=y_train)
 
 # --- Make prediction
@@ -50,7 +60,7 @@ probabilities.set_index(x_test.index, inplace=True)
 
 # Cutoffs - Here the minimum of probability can be set for each category.
 # Example: The model must assign at least a probability of xyz in order to make a prediction.
-cutoffs = {'1': 0.75, '0': 0.1, '2': 0.35}
+cutoffs = {'1': 0.8, '0': 0.3, '2': 0.3}
 
 # Create prediction of result-tendency of the game
 probabilities['predicted'] = multiclass_prediction_from_probabilities(
@@ -112,3 +122,7 @@ print("Percent correct bets: " + str(probabilities['correct_bet'].mean().round(2
 print("Average quota in game: " + str(probabilities['quota_in_game'].mean().round(2)))
 print("Average quota predicted: " + str(probabilities['quota_predicted'].mean().round(2)))
 print("Win/Loss: " + str(probabilities['win'].sum().round(2)))
+
+mlflow.log_metric("Win / Loss", probabilities['win'].sum())
+
+mlflow.end_run()
