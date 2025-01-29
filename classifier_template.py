@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.linear_model import SGDClassifier
 from sklearn.svm import SVC
+from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import precision_score, recall_score, accuracy_score, roc_auc_score
 from datenmanagement_wetter import (x_train, x_test, x_vali,
@@ -10,18 +11,18 @@ from datenmanagement_wetter import (x_train, x_test, x_vali,
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.metrics import make_scorer, accuracy_score
 
-param_grid = {"max_depth": [4, 5, 6],
-              "n_estimators": [50, 100, 150],
-              "min_samples_split": [2, 3]}
+# param_grid = {"max_depth": [4, 5, 6],
+#               "n_estimators": [50, 100, 150],
+#               "min_samples_split": [2, 3]}
 
 scorer = make_scorer(accuracy_score)
 
-classifier = GradientBoostingClassifier()
-random_search = RandomizedSearchCV(classifier, scoring=scorer, cv=3, param_distributions=param_grid, n_iter=4)
-random_search.fit(x_train, y_train)
+classifier = MLPClassifier(hidden_layer_sizes=(200, 100, 100, 50, 10), max_iter=2000)
+# random_search = RandomizedSearchCV(classifier, scoring=scorer, cv=3, param_distributions=param_grid, n_iter=4)
+classifier.fit(x_train, y_train)
 
-print(random_search.best_params_)
-classifier = random_search.best_estimator_
+# print(random_search.best_params_)
+# classifier = random_search.best_estimator_
 
 
 mlflow.start_run()
@@ -29,8 +30,8 @@ mlflow.start_run()
 # PARAMS = {"max_depth": 3,
 #           "n_estimators": 100}
 
-for key, value in random_search.best_params_.items():
-    mlflow.log_param(key, value)
+# for key, value in random_search.best_params_.items():
+#     mlflow.log_param(key, value)
 
 # mlflow.log_param("n_estimators", PARAMS["n_estimators"])
 # mlflow.log_param("max_depth", PARAMS["max_depth"])
